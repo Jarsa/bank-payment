@@ -387,15 +387,12 @@ class AccountPaymentOrder(models.Model):
             )
             simplified_form_view = self.env.ref(
                 "account_payment_order.view_attachment_simplified_form"
-            )
+            ) 
             action = {
-                "name": _("Payment File"),
-                "view_mode": "form",
-                "view_id": simplified_form_view.id,
-                "res_model": "ir.attachment",
-                "type": "ir.actions.act_window",
-                "target": "current",
-                "res_id": attachment.id,
+                'type': 'ir.actions.act_url',
+                'url': '/web/content/%s/%s?download=true' % (attachment.id, filename),
+                'target': 'self',
+                'nodestroy': False,
             }
         self.write(
             {
