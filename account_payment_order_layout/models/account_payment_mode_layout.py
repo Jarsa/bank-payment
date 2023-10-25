@@ -122,24 +122,25 @@ class AccountPaymentModeLayout(models.Model):
         self.ensure_one()
         payment_line = ""
         separator = self.separator or ""
-        payment_line += (
-            separator.join(line._process_line(order) for line in self.header_line_ids)
-            + "\n"
-        )
+        header_line = separator.join(line._process_line(order) for line in self.header_line_ids)
+        if header_line:
+            payment_line += header_line + "\n"
         errors = set()
+        count = len(order.payment_ids)
         for payment in order.payment_ids:
             for line in self.line_ids:
                 result = line._process_line(order, payment)
                 payment_line += separator.join(result["result"])
                 if result["error"]:
                     errors.add(result["error"])
-            payment_line += "\n"
+            count -= 1
+            if count >= 1:
+                payment_line += "\n"
         if errors:
             raise UserError("\n".join(errors))
-        payment_line += (
-            separator.join(line._process_line(order) for line in self.footer_line_ids)
-            + "\n"
-        )
+        footer_line = separator.join(line._process_line(order) for line in self.footer_line_ids)
+        if footer_line:
+            payment_line += footer_line
         file_name = safe_eval(self.print_file_name, {"order": order, "time": time})
         return (payment_line.encode("ascii"), file_name)
 
