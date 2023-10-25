@@ -130,9 +130,10 @@ class AccountPaymentModeLayout(models.Model):
         for payment in order.payment_ids:
             for line in self.line_ids:
                 result = line._process_line(order, payment)
-                payment_line += separator.join(result["result"]) + "\n"
+                payment_line += separator.join(result["result"])
                 if result["error"]:
                     errors.add(result["error"])
+            payment_line += "\n"
         if errors:
             raise UserError("\n".join(errors))
         payment_line += (
