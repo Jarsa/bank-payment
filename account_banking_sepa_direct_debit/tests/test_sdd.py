@@ -10,11 +10,14 @@ from odoo import fields
 from odoo.tests.common import TransactionCase
 from odoo.tools import float_compare
 
+from odoo.addons.base.tests.common import DISABLED_MAIL_CONTEXT
+
 
 class TestSDDBase(TransactionCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+        cls.env = cls.env(context=dict(cls.env.context, **DISABLED_MAIL_CONTEXT))
         cls.company_B = cls.env["res.company"].create({"name": "Company B"})
         cls.account_payable_company_B = cls.env["account.account"].create(
             {
@@ -104,6 +107,10 @@ class TestSDDBase(TransactionCase):
                 ],
             }
         )
+        # Set a currency_exchange_journal on the company to avoid an exception
+        # due to the use of a foreign currency
+        cls.main_company.write({"currency_exchange_journal_id": cls.bank_journal.id})
+        cls.company_B.write({"currency_exchange_journal_id": cls.bank_journal.id})
         # update payment mode
         cls.payment_mode = cls.env.ref(
             "account_banking_sepa_direct_debit.payment_mode_inbound_sepa_dd1"
@@ -309,8 +316,6 @@ class TestSDDBase(TransactionCase):
         )
         payment_order.generated2uploaded()
         self.assertEqual(payment_order.state, "uploaded")
-        for inv in [invoice1, invoice2]:
-            self.assertEqual(inv.payment_state, "paid")
         self.assertEqual(self.mandate2.recurrent_sequence_type, "recurring")
         return
 

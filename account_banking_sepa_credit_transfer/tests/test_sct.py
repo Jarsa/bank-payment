@@ -11,11 +11,14 @@ from lxml import etree
 from odoo.exceptions import UserError
 from odoo.tests.common import TransactionCase
 
+from odoo.addons.base.tests.common import DISABLED_MAIL_CONTEXT
+
 
 class TestSCT(TransactionCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+        cls.env = cls.env(context=dict(cls.env.context, **DISABLED_MAIL_CONTEXT))
         cls.account_model = cls.env["account.account"]
         cls.move_model = cls.env["account.move"]
         cls.journal_model = cls.env["account.journal"]
@@ -256,6 +259,9 @@ class TestSCT(TransactionCase):
         return
 
     def test_usd_currency_sct(self):
+        # Set a currency_exchange_journal on the company to avoid an exception
+        # due to the use of a foreign currency
+        self.main_company.write({"currency_exchange_journal_id": self.bank_journal.id})
         invoice1 = self.create_invoice(
             self.partner_asus.id,
             "account_payment_mode.res_partner_2_iban",
