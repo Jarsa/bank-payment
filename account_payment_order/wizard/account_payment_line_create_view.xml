@@ -9,7 +9,7 @@
         <field name="name">account_payment_line_create.form</field>
         <field name="model">account.payment.line.create</field>
         <field name="arch" type="xml">
-            <form string="Choose Move Lines Filter Options">
+            <form>
                 <group name="main">
                     <field name="date_type" />
                     <field
@@ -35,7 +35,6 @@
                     <field name="payment_mode" />
                     <field name="target_move" widget="radio" />
                     <field name="invoice" />
-                    <field name="allow_blocked" />
                     <label
                         for="populate"
                         string="Click on Add All Move Lines to auto-select the move lines matching the above criteria or click on Add an item to manually select the move lines filtered by the above criteria."
@@ -56,7 +55,7 @@
                         name="move_line_ids"
                         nolabel="1"
                         force_save="1"
-                        context="{'tree_view_ref': 'account_payment_order.view_move_line_tree', 'form_view_ref':'account_payment_order.view_move_line_form_no_edit'}"
+                        context="{'list_view_ref': 'account_payment_order.view_move_line_tree', 'form_view_ref':'account_payment_order.view_move_line_form_no_edit'}"
                         domain="move_line_domain"
                         colspan="2"
                     >

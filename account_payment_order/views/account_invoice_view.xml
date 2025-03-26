@@ -82,7 +82,7 @@
         <field name="model">account.move</field>
         <field name="inherit_id" ref="account.view_invoice_tree" />
         <field name="arch" type="xml">
-            <button name="action_register_payment" position="after">
+            <button name="action_force_register_payment" position="after">
                 <button
                     name="%(account_invoice_create_account_payment_line_action)d"
                     type="action"
