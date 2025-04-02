@@ -174,31 +174,25 @@ class AccountMove(models.Model):
                     count += 1
                 if new_payorder:
                     move.message_post(
-                        body=Markup(
-                            self.env._(
-                                "%(count)d payment lines added "
-                                "to the new draft payment "
-                                "order <a href=# data-oe-model=account.payment.order "
-                                "data-oe-id=%(order_id)d>%(name)s</a>, "
-                                "which has been automatically created.",
-                                count=count,
-                                order_id=payorder.id,
-                                name=payorder.name,
-                            )
+                        body=self.env._(
+                            "%(count)d payment lines added to the new draft payment "
+                            "order %(payorder_link)s, which has been automatically "
+                            "created.",
+                            count=count,
+                            payorder_link=Markup(
+                                payorder._get_html_link(title=payorder.name)
+                            ),
                         )
                     )
                 else:
                     move.message_post(
-                        body=Markup(
-                            self.env._(
-                                "%(count)d payment lines added to the existing draft "
-                                "payment order "
-                                "<a href=# data-oe-model=account.payment.order "
-                                "data-oe-id=%(order_id)d>%(name)s</a>.",
-                                count=count,
-                                order_id=payorder.id,
-                                name=payorder.name,
-                            )
+                        body=self.env._(
+                            "%(count)d payment lines added to the existing draft "
+                            "payment order %(payorder_link)s.",
+                            count=count,
+                            payorder_link=Markup(
+                                payorder._get_html_link(title=payorder.name)
+                            ),
                         )
                     )
         action_xml_id = (
