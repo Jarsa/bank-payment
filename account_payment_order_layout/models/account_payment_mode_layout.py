@@ -51,6 +51,12 @@ class AccountPaymentModeLayout(models.Model):
         help="Lines that will be added to the footer of the file",
         domain=[("usage", "=", "footer")],
     )
+    detail_line_ids = fields.One2many(
+        comodel_name="account.payment.mode.layout.line",
+        inverse_name="layout_id",
+        string="Detail Lines",
+        domain=[("usage", "=", "detail")],
+    )
     model_id = fields.Many2one(
         comodel_name="ir.model",
         domain=[("model", "in", ["account.payment.order", "account.payment"])],
@@ -121,21 +127,35 @@ class AccountPaymentModeLayout(models.Model):
         """
         self.ensure_one()
         payment_line = ""
-        separator = self.separator or ""
+        separator = self._get_separator()
         header_line = separator.join(line._process_line(order) for line in self.header_line_ids)
         if header_line:
             payment_line += header_line + "\n"
         errors = set()
         count = len(order.payment_ids)
         for payment in order.payment_ids:
+            payment_list = []
             for line in self.line_ids:
                 result = line._process_line(order, payment)
-                payment_line += separator.join(result["result"])
+                payment_list.append(result["result"])
                 if result["error"]:
                     errors.add(result["error"])
+            payment_line += separator.join(payment_list)
             count -= 1
-            if count >= 1:
+            if count >= 1 or self.detail_line_ids or self.footer_line_ids:
                 payment_line += "\n"
+            detail_count = len(payment.payment_line_ids)
+            for pay_line in payment.payment_line_ids:
+                detail_list = []
+                for detail in self.detail_line_ids:
+                    result = detail._process_line(order, pay_line)
+                    detail_list.append(result["result"])
+                    if result["error"]:
+                        errors.add(result["error"])
+                payment_line += separator.join(result["result"])
+                detail_count -= 1
+                if detail_count >= 1 or self.footer_line_ids:
+                    payment_line += "\n"
         if errors:
             raise UserError("\n".join(errors))
         footer_line = separator.join(line._process_line(order) for line in self.footer_line_ids)
@@ -143,6 +163,19 @@ class AccountPaymentModeLayout(models.Model):
             payment_line += footer_line
         file_name = safe_eval(self.print_file_name, {"order": order, "time": time})
         return (payment_line.encode("ascii"), file_name)
+
+    def _get_separator(self):
+        """
+        Get the separator character for the payment file.
+
+        :return: The separator character.
+        :rtype: str
+        """
+        self.ensure_one()
+        separator_dict = {
+            "tab": chr(9),
+        }
+        return separator_dict.get(self.separator, self.separator or "")
 
     @api.constrains("print_file_name")
     def _check_print_file_name(self):
@@ -194,6 +227,7 @@ class AccountPaymentModeLayoutLine(models.Model):
             ("header", "Header"),
             ("line", "Line"),
             ("footer", "Footer"),
+            ("detail", "Detail"),
         ],
         required=True,
     )
