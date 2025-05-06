@@ -28,6 +28,12 @@
                                 context="{'default_usage': 'line'}"
                             />
                         </page>
+                        <page name="detail" string="Detail">
+                            <field
+                                name="detail_line_ids"
+                                context="{'default_usage': 'detail'}"
+                            />
+                        </page>
                         <page name="header" string="Header">
                             <field
                                 name="header_line_ids"
