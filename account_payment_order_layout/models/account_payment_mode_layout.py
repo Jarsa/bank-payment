@@ -128,39 +128,48 @@ class AccountPaymentModeLayout(models.Model):
         self.ensure_one()
         payment_line = ""
         separator = self._get_separator()
-        header_line = separator.join(line._process_line(order) for line in self.header_line_ids)
-        if header_line:
-            payment_line += header_line + "\n"
+        # HEADER GENERATE
+        header_list = []
+        for line in self.header_line_ids:
+            result = line._process_line(order)
+            header_list.append(result["result"])
+            if result["error"]:
+                errors.add(result["error"])
+        if header_list:
+            payment_line += separator.join(header_list) + "\n"
         errors = set()
-        count = len(order.payment_ids)
+        secuence = 1
         for payment in order.payment_ids:
+        # LINE GENERATE
             payment_list = []
             for line in self.line_ids:
-                result = line._process_line(order, payment)
+                result = line._process_line(order, payment, secuence)
                 payment_list.append(result["result"])
                 if result["error"]:
                     errors.add(result["error"])
-            payment_line += separator.join(payment_list)
-            count -= 1
-            if count >= 1 or self.detail_line_ids or self.footer_line_ids:
-                payment_line += "\n"
-            detail_count = len(payment.payment_line_ids)
-            for pay_line in payment.payment_line_ids:
-                detail_list = []
-                for detail in self.detail_line_ids:
-                    result = detail._process_line(order, pay_line)
-                    detail_list.append(result["result"])
-                    if result["error"]:
-                        errors.add(result["error"])
-                payment_line += separator.join(result["result"])
-                detail_count -= 1
-                if detail_count >= 1 or self.footer_line_ids:
-                    payment_line += "\n"
+            payment_line += separator.join(payment_list) + "\n"
+            secuence += 1
+        pay_line_secuence = 1
+        # DETAIL GENERATE
+        for pay_line in payment.payment_line_ids:
+            detail_list = []
+            for detail in self.detail_line_ids:
+                result = detail._process_line(order, pay_line, pay_line_secuence)
+                detail_list.append(result["result"])
+                if result["error"]:
+                    errors.add(result["error"])
+            payment_line += separator.join(detail_list) + "\n"
+            pay_line_secuence += 1
         if errors:
             raise UserError("\n".join(errors))
-        footer_line = separator.join(line._process_line(order) for line in self.footer_line_ids)
-        if footer_line:
-            payment_line += footer_line
+        footer_list = []
+        for footer_line in self.footer_line_ids:
+            result = footer_line._process_line(order)
+            footer_list.append(result["result"])
+            if result["error"]:
+                errors.add(result["error"])
+        if footer_list:
+            payment_line += separator.join(footer_list) + "\n"
         file_name = safe_eval(self.print_file_name, {"order": order, "time": time})
         return (payment_line.encode("ascii"), file_name)
 
@@ -174,6 +183,7 @@ class AccountPaymentModeLayout(models.Model):
         self.ensure_one()
         separator_dict = {
             "tab": chr(9),
+
         }
         return separator_dict.get(self.separator, self.separator or "")
 
@@ -232,7 +242,7 @@ class AccountPaymentModeLayoutLine(models.Model):
         required=True,
     )
 
-    def _get_eval_context(self, order, line):
+    def _get_eval_context(self, order, line, secuence):
         """
         Prepare the context used when evaluating python code, like the python formulas
         or code server actions.
@@ -279,9 +289,11 @@ class AccountPaymentModeLayoutLine(models.Model):
             "time": tools.safe_eval.time,
             "UserError": UserError,
             "log": log,
+            "secuence": secuence,
+            "ref": self.env.ref,
         }
 
-    def _process_line(self, order, line=False):
+    def _process_line(self, order, line=False, secuence=False):
         """
         Process a line in the payment file layout by evaluating the Python code in the `code` field.
 
@@ -294,7 +306,7 @@ class AccountPaymentModeLayoutLine(models.Model):
         :rtype: dict
         """
         self.ensure_one()
-        eval_context = self._get_eval_context(order, line)
+        eval_context = self._get_eval_context(order, line, secuence)
         safe_eval(self.code.strip(), eval_context, mode="exec", nocopy=True)
         result = str(eval_context.get("result", ""))
         error = str(eval_context.get("error", ""))
