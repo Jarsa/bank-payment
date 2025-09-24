@@ -11,6 +11,7 @@
                         <group>
                             <field name="name" />
                             <field name="code" />
+                            <field name="encoding" />
                         </group>
                         <group>
                             <field name="print_file_name" />
