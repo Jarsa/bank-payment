@@ -60,6 +60,14 @@ class AccountPaymentModeLayout(models.Model):
     submodel_id = fields.Many2one(comodel_name="ir.model", store=False)
     submodel_field_id = fields.Many2one(comodel_name="ir.model.fields", store=False)
     expression = fields.Char(store=False)
+    encoding = fields.Selection(
+        selection=[
+            ("ascii", "ASCII"),
+            ("utf_8", "UTF-8"),
+            ("cp1252", "ANSI (Windows-1252)"),
+        ],
+        default="ascii",
+    )
 
     @api.onchange('model_field_id', 'submodel_id', 'submodel_field_id')
     def _onchange_dynamic_placeholder(self):
@@ -142,7 +150,7 @@ class AccountPaymentModeLayout(models.Model):
         if footer_line:
             payment_line += footer_line
         file_name = safe_eval(self.print_file_name, {"order": order, "time": time})
-        return (payment_line.encode("ascii"), file_name)
+        return (payment_line.encode(self.encoding), file_name)
 
     @api.constrains("print_file_name")
     def _check_print_file_name(self):
