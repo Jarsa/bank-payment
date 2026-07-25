@@ -3,7 +3,7 @@
     "name": "Account Payment Order Tier Validation",
     "summary": "Extends the functionality of Account Payment Orders to "
     "support a tier validation process.",
-    "version": "17.0.1.0.0",
+    "version": "19.0.1.0.0",
     "category": "Accounting & Finance",
     "website": "https://github.com/OCA/bank-payment",
     "author": "Jarsa, Odoo Community Association (OCA)",
