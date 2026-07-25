@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <odoo>
-
     <record id="account_payment_mode_layout_view_form" model="ir.ui.view">
         <field name="name">account.payment.mode.layout.view.form</field>
         <field name="model">account.payment.mode.layout</field>
@@ -126,7 +125,8 @@
         <field name="help" type="html">
             <p class="oe_view_nocontent_create">
                 Click to create a new payment mode layout.
-            </p><p>
+            </p>
+            <p>
                 Payment mode layouts are used to define the layout of the payment
                 order file.
             </p>
@@ -140,5 +140,4 @@
         action="account_payment_mode_layout_action"
         sequence="26"
     />
-
 </odoo>
