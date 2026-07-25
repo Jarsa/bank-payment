@@ -240,7 +240,7 @@ class AccountPaymentModeLayoutLine(models.Model):
                     (
                         self.env.uid,
                         "server",
-                        self._cr.dbname,
+                        self.env.cr.dbname,
                         __name__,
                         level,
                         message,
@@ -275,7 +275,7 @@ class AccountPaymentModeLayoutLine(models.Model):
         """
         self.ensure_one()
         eval_context = self._get_eval_context(order, line)
-        safe_eval(self.code.strip(), eval_context, mode="exec", nocopy=True)
+        safe_eval(self.code.strip(), eval_context, mode="exec")
         result = str(eval_context.get("result", ""))
         error = str(eval_context.get("error", ""))
         return {
