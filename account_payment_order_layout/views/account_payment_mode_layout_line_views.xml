@@ -27,10 +27,10 @@
     </record>
 
     <record id="account_payment_mode_layout_line_view_tree" model="ir.ui.view">
-        <field name="name">account.payment.mode.layout.line.view.tree</field>
+        <field name="name">account.payment.mode.layout.line.view.list</field>
         <field name="model">account.payment.mode.layout.line</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="usage" column_invisible="1" />
                 <field name="sequence" widget="handle" />
                 <field name="name" />
@@ -45,7 +45,7 @@
                     optional="hide"
                 />
                 <field name="description" optional="show" />
-            </tree>
+            </list>
         </field>
     </record>
 </odoo>

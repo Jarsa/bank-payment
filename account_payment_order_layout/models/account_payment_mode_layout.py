@@ -240,7 +240,7 @@ class AccountPaymentModeLayoutLine(models.Model):
                     (
                         self.env.uid,
                         "server",
-                        self._cr.dbname,
+                        self.env.cr.dbname,
                         __name__,
                         level,
                         message,
