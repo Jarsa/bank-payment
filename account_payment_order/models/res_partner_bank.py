@@ -5,21 +5,18 @@ from odoo import api, models
 from odoo.exceptions import ValidationError
 
 
-class ResBank(models.Model):
-    _inherit = "res.bank"
+class ResPartnerBank(models.Model):
+    _inherit = "res.partner.bank"
 
-    @api.constrains("bic")
+    @api.constrains("bank_bic")
     def check_bic_length(self):
         for bank in self:
-            if bank.bic and len(bank.bic) not in (8, 11):
+            if bank.bank_bic and len(bank.bank_bic) not in (8, 11):
                 raise ValidationError(
                     self.env._(
                         "A valid BIC contains 8 or 11 characters. The BIC '%(bic)s' "
                         "contains %(num)d characters, so it is not valid.",
-                        bic=bank.bic,
-                        num=len(bank.bic),
+                        bic=bank.bank_bic,
+                        num=len(bank.bank_bic),
                     )
                 )
-
-
-# starting from v9, on res.partner.bank bank_bic is a related of bank_id.bic

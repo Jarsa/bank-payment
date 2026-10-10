@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <!--
   © 2016 Akretion (Alexis de Lattre <alexis.delattre@akretion.com>)
   License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
@@ -36,7 +36,7 @@
                     name="action_payment_lines"
                     type="object"
                     invisible="not payment_line_count"
-                    icon="fa-bars"
+                    icon="menu"
                     help="Payment Order Lines"
                     groups="account_payment_order.group_account_payment"
                 >

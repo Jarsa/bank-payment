@@ -7,23 +7,17 @@ from odoo.addons.base.tests.common import BaseCommon
 
 
 class TestBank(BaseCommon):
+    # Keep running the tests as the environment user, like account's own tests
+    _test_user_groups = None
+
     def test_bank(self):
-        bank = self.env["res.bank"].search([], limit=1)
-        if not bank:
-            # This should only happen if we don't have demo data
-            bank = (
-                self.env["res.bank"]
-                .env["res.bank"]
-                .create(
-                    {
-                        "name": "Fiducial Banque",
-                        "bic": "FIDCFR21XXX",
-                        "street": "38 rue Sergent Michel Berthet",
-                        "zip": "69009",
-                        "city": "Lyon",
-                        "country": self.env.ref("base.fr").id,
-                    }
-                )
-            )
+        bank = self.env["res.partner.bank"].create(
+            {
+                "account_number": "FR76 4242 4242 4242 4242 4242 424",
+                "partner_id": self.partner.id,
+                "bank_name": "Fiducial Banque",
+                "bank_bic": "FIDCFR21XXX",
+            }
+        )
         with self.assertRaises(ValidationError):
-            bank.bic = "TEST"
+            bank.bank_bic = "TEST"
