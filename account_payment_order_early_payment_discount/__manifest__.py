@@ -4,7 +4,7 @@
     "name": "Payment Orders with Early Payment Discount",
     "summary": "Take the early payment discount in payment orders and pay "
     "preferred suppliers on their early payment date",
-    "version": "19.0.1.0.0",
+    "version": "20.0.1.0.0",
     "category": "Banking addons",
     "website": "https://github.com/OCA/bank-payment",
     "author": "Jarsa, Odoo Community Association (OCA)",
