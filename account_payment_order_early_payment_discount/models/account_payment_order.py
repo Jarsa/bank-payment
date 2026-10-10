@@ -41,9 +41,11 @@ class AccountPaymentOrder(models.Model):
             ]
         )
         lines = lines.filtered(
-            lambda line: line.move_id._early_payment_pay_date() == pay_date
-            and not line.payment_line_ids.filtered(
-                lambda payment: payment.state in ("draft", "open", "generated")
+            lambda line: (
+                line.move_id._early_payment_pay_date() == pay_date
+                and not line.payment_line_ids.filtered(
+                    lambda payment: payment.state in ("draft", "open", "generated")
+                )
             )
         )
         if not lines:
